@@ -30,6 +30,7 @@ struct MyException
 
 void SIGINTHandler(int)
 {
+    cout << endl << "signal caught" << endl;
     keep_going = false;
 }
 
