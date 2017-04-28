@@ -13,10 +13,30 @@
 #include <arpa/inet.h>
 #include <getopt.h>
 
+// NOTE:
+// NOTE:	There is a latent bug in this code. It is an exercise to the
+// NOTE:	reader to realize what it is.  Hint, the code will work fine
+// NOTE:	on two computers with the same processor.
+// NOTE:
+
+/*	This multi-threaded server will accept up to 10 connections at once.
+	It will read framed strings, and print them. Receiving "quit" causes
+	the thread handling the connection to quit.
+
+	Build with:
+
+	g++ -std=c++11 server.cpp -pthread -o server
+
+*/
+
 using namespace std;
 
 bool keep_going = true;
 const int max_connections = 10;
+
+/*	This is a fairly nice touch. Note the use of the #define to 
+	correctly capture __LINE__ and __FUNCTION__.
+*/
 
 struct MyException
 {
@@ -73,8 +93,10 @@ void AcceptConnections(int port)
 
 	// By default, Linux apparently retries  interrupted system calls.  This defeats the
 	// purpose of interrupting them, doesn't it? The call to siginterrupt disables this.
+
 	signal(SIGINT, SIGINTHandler);
 	siginterrupt(SIGINT, 1);
+
 	int incoming_socket = -1;
 	int listening_socket = -1;
 
@@ -84,6 +106,8 @@ void AcceptConnections(int port)
 		if (listening_socket < 0) {
 			throw MYEXCEPTION("opening listening socket failed " + string(strerror(errno)));
 		}
+
+		// This sockopt allows immediate reuse of a formerly bound port.
 
 		int optval = 1;
 		optval = setsockopt(listening_socket, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);
@@ -129,6 +153,13 @@ void AcceptConnections(int port)
 
 	if (listening_socket >= 0)
 		close(listening_socket);
+
+	// NOTE:
+	// NOTE:	This is a questionable way of joining threads. A better
+	// NOTE:	way would  notice a thread's  termination  earlier  and
+	// NOTE:	join then. This code joins only when the application is
+	// NOTE:	exiting.
+	// NOTE:
 
 	for (auto it = threads.begin(); it < threads.end(); it++) {
 		if (*it != nullptr) {
