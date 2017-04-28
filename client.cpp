@@ -1,3 +1,6 @@
+// Perry Kivolowitz  -  Carthage  College  Computer  Science
+// Free to use / modify for any purpose. Leave this message.
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -15,6 +18,18 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 
+// NOTE:
+// NOTE:	There is a latent bug in this code. It is an exercise to the
+// NOTE:	reader to realize what it is.  Hint, the code will work fine
+// NOTE:	on two computers with the same processor.
+// NOTE:
+
+/*
+	Build with:
+
+	g++ -std=c++11 client.cpp -o client
+*/
+
 using namespace std;
 
 bool keep_going = true;
@@ -31,6 +46,7 @@ struct MyException
 
 void SIGINTHandler(int)
 {
+    cout << endl << "signal caught" << endl;
     keep_going = false;
 }
 

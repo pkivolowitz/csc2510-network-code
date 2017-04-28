@@ -1,3 +1,6 @@
+// Perry Kivolowitz  -  Carthage  College  Computer  Science
+// Free to use / modify for any purpose. Leave this message.
+
 #include <iostream>
 #include <iomanip>
 #include <string>
